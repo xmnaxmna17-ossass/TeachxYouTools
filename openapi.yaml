@@ -1,0 +1,604 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Arabic AI Tools Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: tools
+    description: AI and utility tool operations
+  - name: openai
+    description: OpenAI AI chat operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /tools/summarize:
+    post:
+      operationId: summarizeText
+      tags: [tools]
+      summary: Summarize Arabic or English text using AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SummarizeInput"
+      responses:
+        "200":
+          description: Summarized text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /tools/generate-prompt:
+    post:
+      operationId: generatePrompt
+      tags: [tools]
+      summary: Generate AI prompts from a topic or idea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PromptInput"
+      responses:
+        "200":
+          description: Generated prompts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptsResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /tools/generate-caption:
+    post:
+      operationId: generateCaption
+      tags: [tools]
+      summary: Generate social media captions in Arabic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaptionInput"
+      responses:
+        "200":
+          description: Generated captions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaptionsResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /tools/homework-help:
+    post:
+      operationId: homeworkHelp
+      tags: [tools]
+      summary: Get AI homework help for a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HomeworkInput"
+      responses:
+        "200":
+          description: Homework answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /tools/text-to-emoji:
+    post:
+      operationId: textToEmoji
+      tags: [tools]
+      summary: Convert Arabic or English text to emoji representation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TextInput"
+      responses:
+        "200":
+          description: Emoji result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /tools/generate-resume:
+    post:
+      operationId: generateResume
+      tags: [tools]
+      summary: Generate a professional Arabic CV/Resume
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResumeInput"
+      responses:
+        "200":
+          description: Generated resume HTML
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /tools/stats:
+    get:
+      operationId: getToolStats
+      tags: [tools]
+      summary: Get platform statistics (total tool uses, trending tools)
+      responses:
+        "200":
+          description: Platform statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  /openai/conversations:
+    get:
+      operationId: listOpenaiConversations
+      tags: [openai]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiConversation"
+    post:
+      operationId: createOpenaiConversation
+      tags: [openai]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenaiConversationInput"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversation"
+
+  /openai/conversations/{id}:
+    get:
+      operationId: getOpenaiConversation
+      tags: [openai]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversationWithMessages"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiError"
+    delete:
+      operationId: deleteOpenaiConversation
+      tags: [openai]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiError"
+
+  /openai/conversations/{id}/messages:
+    get:
+      operationId: listOpenaiMessages
+      tags: [openai]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiMessage"
+    post:
+      operationId: sendOpenaiMessage
+      tags: [openai]
+      summary: Send a text message and receive a streaming text response
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenaiMessageInput"
+      responses:
+        "200":
+          description: SSE stream of assistant text chunks
+          content:
+            text/event-stream: {}
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    TextInput:
+      type: object
+      properties:
+        text:
+          type: string
+        language:
+          type: string
+          enum: [ar, en, both]
+          default: ar
+      required:
+        - text
+
+    SummarizeInput:
+      type: object
+      properties:
+        text:
+          type: string
+        length:
+          type: string
+          enum: [short, medium, long]
+          default: medium
+        language:
+          type: string
+          enum: [ar, en]
+          default: ar
+      required:
+        - text
+
+    PromptInput:
+      type: object
+      properties:
+        topic:
+          type: string
+        style:
+          type: string
+          enum: [creative, professional, educational, marketing]
+          default: creative
+        count:
+          type: integer
+          default: 5
+        language:
+          type: string
+          enum: [ar, en, both]
+          default: ar
+      required:
+        - topic
+
+    CaptionInput:
+      type: object
+      properties:
+        topic:
+          type: string
+        platform:
+          type: string
+          enum: [instagram, twitter, tiktok, linkedin, general]
+          default: general
+        tone:
+          type: string
+          enum: [funny, professional, motivational, casual]
+          default: casual
+        count:
+          type: integer
+          default: 3
+      required:
+        - topic
+
+    HomeworkInput:
+      type: object
+      properties:
+        question:
+          type: string
+        subject:
+          type: string
+          enum: [math, science, arabic, english, history, geography, general]
+          default: general
+        grade:
+          type: string
+        language:
+          type: string
+          enum: [ar, en]
+          default: ar
+      required:
+        - question
+
+    ResumeInput:
+      type: object
+      properties:
+        name:
+          type: string
+        jobTitle:
+          type: string
+        summary:
+          type: string
+        experience:
+          type: string
+        education:
+          type: string
+        skills:
+          type: string
+        language:
+          type: string
+          enum: [ar, en]
+          default: ar
+      required:
+        - name
+        - jobTitle
+
+    TextResult:
+      type: object
+      properties:
+        result:
+          type: string
+        toolUsed:
+          type: string
+      required:
+        - result
+        - toolUsed
+
+    PromptsResult:
+      type: object
+      properties:
+        prompts:
+          type: array
+          items:
+            type: string
+        toolUsed:
+          type: string
+      required:
+        - prompts
+        - toolUsed
+
+    CaptionsResult:
+      type: object
+      properties:
+        captions:
+          type: array
+          items:
+            type: string
+        hashtags:
+          type: array
+          items:
+            type: string
+        toolUsed:
+          type: string
+      required:
+        - captions
+        - hashtags
+        - toolUsed
+
+    ResumeResult:
+      type: object
+      properties:
+        html:
+          type: string
+        text:
+          type: string
+        toolUsed:
+          type: string
+      required:
+        - html
+        - text
+        - toolUsed
+
+    ToolStat:
+      type: object
+      properties:
+        toolId:
+          type: string
+        name:
+          type: string
+        uses:
+          type: integer
+        trending:
+          type: boolean
+      required:
+        - toolId
+        - name
+        - uses
+        - trending
+
+    PlatformStats:
+      type: object
+      properties:
+        totalUses:
+          type: integer
+        totalTools:
+          type: integer
+        trending:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolStat"
+      required:
+        - totalUses
+        - totalTools
+        - trending
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    OpenaiConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - createdAt
+
+    OpenaiMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: integer
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    OpenaiConversationInput:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    OpenaiMessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    OpenaiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenaiMessage"
+      required:
+        - id
+        - title
+        - createdAt
+        - messages
+
+    OpenaiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
